@@ -205,6 +205,16 @@ input {
   border-radius: 10px;
   border: 1px solid #dbeafe;
   padding: 0.8rem;
+  overflow: hidden;
+}
+
+.game-cover {
+  width: calc(100% + 1.6rem);
+  margin: -0.8rem -0.8rem 0.7rem;
+  height: 160px;
+  object-fit: cover;
+  display: block;
+  border-radius: 8px 8px 0 0;
 }
 
 .game-card h4 {
