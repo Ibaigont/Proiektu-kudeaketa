@@ -75,7 +75,7 @@ function toggleAuthUI() {
   userInfo.classList.toggle("hidden", !loggedIn);
 
   if (loggedIn) {
-    welcomeText.textContent = `Usuario: ${state.user.username} (${state.user.role})`;
+    welcomeText.textContent = `Erabiltzailea: ${state.user.username} (${state.user.role})`;
 
     const isAdmin = state.user.role === "admin";
     adminTab.classList.toggle("hidden", !isAdmin);
@@ -87,7 +87,7 @@ function renderGames() {
   const canSaveFavorites = state.user && state.user.role === "standard";
 
   if (state.games.length === 0) {
-    gamesList.innerHTML = "<p>No hay videojuegos disponibles.</p>";
+    gamesList.innerHTML = "<p>Ez dago bideojoko erabilgarririk.</p>";
     return;
   }
 
@@ -96,13 +96,13 @@ function renderGames() {
       return `
         <article class="game-card">
           <h4>${escapeHtml(game.title)}</h4>
-          <p><strong>Genero:</strong> ${escapeHtml(game.genre)}</p>
+          <p><strong>Generoa:</strong> ${escapeHtml(game.genre)}</p>
           <p><strong>Plataforma:</strong> ${escapeHtml(game.platform)}</p>
-          <p><strong>Precio:</strong> ${Number(game.price).toFixed(2)} EUR</p>
+          <p><strong>Prezioa:</strong> ${Number(game.price).toFixed(2)} EUR</p>
           <p><strong>Stock:</strong> ${escapeHtml(game.stock)}</p>
           ${
             canSaveFavorites
-              ? `<button class="btn" data-fav-add="${escapeHtml(game.id)}">Guardar en mi lista</button>`
+              ? `<button class="btn" data-fav-add="${escapeHtml(game.id)}">Nire zerrendan gorde</button>`
               : ""
           }
         </article>
@@ -113,12 +113,12 @@ function renderGames() {
 
 function renderFavorites() {
   if (!state.user || state.user.role !== "standard") {
-    favoritesList.innerHTML = "<p>Solo disponible para usuarios estandar.</p>";
+    favoritesList.innerHTML = "<p>Erabiltzaile estandarrentzat soilik erabilgarria.</p>";
     return;
   }
 
   if (state.favorites.length === 0) {
-    favoritesList.innerHTML = "<p>Tu lista personal esta vacia.</p>";
+    favoritesList.innerHTML = "<p>Zure zerrenda pertsonala hutsik dago.</p>";
     return;
   }
 
@@ -127,10 +127,10 @@ function renderFavorites() {
       return `
         <article class="game-card">
           <h4>${escapeHtml(game.title)}</h4>
-          <p><strong>Genero:</strong> ${escapeHtml(game.genre)}</p>
+          <p><strong>Generoa:</strong> ${escapeHtml(game.genre)}</p>
           <p><strong>Plataforma:</strong> ${escapeHtml(game.platform)}</p>
-          <p><strong>Precio:</strong> ${Number(game.price).toFixed(2)} EUR</p>
-          <button class="btn btn-ghost" data-fav-remove="${escapeHtml(game.id)}">Quitar</button>
+          <p><strong>Prezioa:</strong> ${Number(game.price).toFixed(2)} EUR</p>
+          <button class="btn btn-ghost" data-fav-remove="${escapeHtml(game.id)}">Kendu</button>
         </article>
       `;
     })
@@ -139,12 +139,12 @@ function renderFavorites() {
 
 function renderAdminGames() {
   if (!state.user || state.user.role !== "admin") {
-    adminGamesList.innerHTML = "<p>Solo administradores.</p>";
+    adminGamesList.innerHTML = "<p>Administratzaileentzat soilik.</p>";
     return;
   }
 
   if (state.games.length === 0) {
-    adminGamesList.innerHTML = "<p>No hay videojuegos que gestionar.</p>";
+    adminGamesList.innerHTML = "<p>Ez dago kudeatzeko bideojokorik.</p>";
     return;
   }
 
@@ -154,10 +154,10 @@ function renderAdminGames() {
         <article class="game-card">
           <h4>${escapeHtml(game.title)}</h4>
           <p>${escapeHtml(game.genre)} | ${escapeHtml(game.platform)}</p>
-          <p>Precio: ${Number(game.price).toFixed(2)} EUR | Stock: ${Number(game.stock)}</p>
+          <p>Prezioa: ${Number(game.price).toFixed(2)} EUR | Stock: ${Number(game.stock)}</p>
           <div class="row-buttons">
-            <button class="btn" data-edit="${escapeHtml(game.id)}">Editar</button>
-            <button class="btn btn-ghost" data-delete="${escapeHtml(game.id)}">Eliminar</button>
+            <button class="btn" data-edit="${escapeHtml(game.id)}">Editatu</button>
+            <button class="btn btn-ghost" data-delete="${escapeHtml(game.id)}">Ezabatu</button>
           </div>
         </article>
       `;
@@ -214,7 +214,7 @@ document.getElementById("register-form").addEventListener("submit", async (event
     });
 
     event.target.reset();
-    showToast("Registro completado. Ya puedes iniciar sesion.");
+    showToast("Erregistroa osatuta. Orain saioa has dezakezu.");
   } catch (error) {
     showToast(error.message, true);
   }
@@ -237,7 +237,7 @@ document.getElementById("login-form").addEventListener("submit", async (event) =
     toggleAuthUI();
     await Promise.all([loadGames(), loadFavorites()]);
     event.target.reset();
-    showToast("Sesion iniciada");
+    showToast("Saioa hasi da");
   } catch (error) {
     showToast(error.message, true);
   }
@@ -251,7 +251,7 @@ document.getElementById("logout-btn").addEventListener("click", () => {
   gamesList.innerHTML = "";
   favoritesList.innerHTML = "";
   adminGamesList.innerHTML = "";
-  showToast("Sesion cerrada");
+  showToast("Saioa itxi da");
 });
 
 document.querySelectorAll(".tab-btn").forEach((button) => {
@@ -273,7 +273,7 @@ gamesList.addEventListener("click", async (event) => {
   try {
     await api(`/api/favorites/${button.dataset.favAdd}`, { method: "POST" });
     await loadFavorites();
-    showToast("Juego guardado en tu lista");
+    showToast("Jokoa zure zerrendan gordeta");
   } catch (error) {
     showToast(error.message, true);
   }
@@ -288,7 +288,7 @@ favoritesList.addEventListener("click", async (event) => {
   try {
     await api(`/api/favorites/${button.dataset.favRemove}`, { method: "DELETE" });
     await loadFavorites();
-    showToast("Juego eliminado de tu lista");
+    showToast("Jokoa zure zerrendatik ezabatuta");
   } catch (error) {
     showToast(error.message, true);
   }
@@ -310,7 +310,7 @@ adminGamesList.addEventListener("click", async (event) => {
     document.getElementById("platform").value = game.platform;
     document.getElementById("price").value = game.price;
     document.getElementById("stock").value = game.stock;
-    document.getElementById("save-game-btn").textContent = "Actualizar";
+    document.getElementById("save-game-btn").textContent = "Eguneratu";
     return;
   }
 
@@ -320,7 +320,7 @@ adminGamesList.addEventListener("click", async (event) => {
     try {
       await api(`/api/games/${gameId}`, { method: "DELETE" });
       await Promise.all([loadGames(), loadFavorites()]);
-      showToast("Juego eliminado");
+      showToast("Jokoa ezabatuta");
     } catch (error) {
       showToast(error.message, true);
     }
@@ -345,18 +345,18 @@ document.getElementById("game-form").addEventListener("submit", async (event) =>
         method: "PUT",
         body: JSON.stringify(payload)
       });
-      showToast("Juego actualizado");
+      showToast("Jokoa eguneratuta");
     } else {
       await api("/api/games", {
         method: "POST",
         body: JSON.stringify(payload)
       });
-      showToast("Juego creado");
+      showToast("Jokoa sortuta");
     }
 
     document.getElementById("game-form").reset();
     document.getElementById("game-id").value = "";
-    document.getElementById("save-game-btn").textContent = "Guardar";
+    document.getElementById("save-game-btn").textContent = "Gorde";
 
     await loadGames();
   } catch (error) {
@@ -367,7 +367,7 @@ document.getElementById("game-form").addEventListener("submit", async (event) =>
 document.getElementById("reset-form-btn").addEventListener("click", () => {
   document.getElementById("game-form").reset();
   document.getElementById("game-id").value = "";
-  document.getElementById("save-game-btn").textContent = "Guardar";
+  document.getElementById("save-game-btn").textContent = "Gorde";
 });
 
 bootstrapApp();

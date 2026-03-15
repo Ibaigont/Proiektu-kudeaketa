@@ -1,93 +1,93 @@
-# ESTIM - Web de Ventas de Videojuegos
+# ESTIM - Bideojokoen Salmenta Web
 
-ESTIM es una aplicacion web CRUD (Create, Read, Update, Delete) para la gestion y consulta de videojuegos.
-Cumple arquitectura SPA + API REST y separa frontend, backend y persistencia de datos.
+ESTIM bideojokoak kudeatzeko eta kontsultatzeko CRUD (Create, Read, Update, Delete) web aplikazio bat da.
+SPA + REST API arkitektura betetzen du eta frontend, backend eta datuen persistentzia bereizten ditu.
 
-## Arquitectura
+## Arkitektura
 
 - `frontend/`: SPA (HTML, CSS, JavaScript).
-- `backend/`: API REST con Express y logica de negocio.
-- `data/`: persistencia con SQLite (`stim.sqlite`).
+- `backend/`: Express-ekin REST API eta negozio-logika.
+- `data/`: SQLite-rekin persistentzia (`stim.sqlite`).
 
-## Requisitos implementados
+## Inplementatutako eskakizunak
 
-1. Sistema de roles:
-- `admin`: puede crear, editar y eliminar videojuegos.
-- `standard`: puede consultar catalogo y guardar una lista personal.
+1. Rol sistema:
+- `admin`: bideojokoak sortu, editatu eta ezabatu ditzake.
+- `standard`: katalogoa kontsultatu eta zerrenda pertsonala gorde dezake.
 
-2. Registro e identificacion:
-- Registro disponible para usuarios estandar.
-- Login para todos los usuarios.
-- El rol se asigna segun lo almacenado en base de datos.
+2. Erregistroa eta identifikazioa:
+- Erregistroa erabiltzaile estandarrentzat eskuragarri.
+- Saio-hasiera erabiltzaile guztientzat.
+- Rola datu-basean gordeta dagoenaren arabera esleitzen da.
 
-3. CRUD bajo rol administrador:
-- Crear: `POST /api/games`
-- Consultar: `GET /api/games`
-- Actualizar: `PUT /api/games/:id`
-- Eliminar: `DELETE /api/games/:id`
+3. CRUD administratzaile rolaren azpian:
+- Sortu: `POST /api/games`
+- Kontsultatu: `GET /api/games`
+- Eguneratu: `PUT /api/games/:id`
+- Ezabatu: `DELETE /api/games/:id`
 
-4. Consulta de datos para usuarios estandar:
-- Listado general de videojuegos (`GET /api/games`).
+4. Erabiltzaile estandarrentzako datu-kontsulta:
+- Bideojokoen zerrenda orokorra (`GET /api/games`).
 
-5. Lista personal para usuarios estandar:
-- Guardar en lista personal: `POST /api/favorites/:gameId`
-- Ver lista personal: `GET /api/favorites`
-- Quitar de lista personal: `DELETE /api/favorites/:gameId`
+5. Erabiltzaile estandarrentzako zerrenda pertsonala:
+- Zerrenda pertsonalean gorde: `POST /api/favorites/:gameId`
+- Zerrenda pertsonala ikusi: `GET /api/favorites`
+- Zerrenda pertsonaletik kendu: `DELETE /api/favorites/:gameId`
 
-## Tecnologias
+## Teknologiak
 
 - Node.js + Express
 - SQLite
 - JavaScript (frontend SPA)
-- JWT para autenticacion
+- JWT autentifikaziorako
 
-## Puesta en marcha
+## Abian jartzea
 
-1. Instalar dependencias:
+1. Mendekotasunak instalatu:
 
 ```bash
 npm install
 ```
 
-2. Arrancar en desarrollo:
+2. Garapen moduan abiarazi:
 
 ```bash
 npm run dev
 ```
 
-Opcional (recarga automatica en cambios, Node moderno):
+Aukerakoa (aldaketetan berrabiarazte automatikoa, Node modernoa):
 
 ```bash
 npm run dev:watch
 ```
 
-3. Arrancar en modo normal:
+3. Modu normalean abiarazi:
 
 ```bash
 npm start
 ```
 
-4. Abrir en navegador:
+4. Nabigatzailean ireki:
 
 `http://localhost:3000`
 
-## Usuario administrador inicial
+## Hasierako administratzaile erabiltzailea
 
-Se crea automaticamente en el primer arranque:
+Lehen abiaraztean automatikoki sortzen da:
 
-- Usuario: `admin`
-- Contrasena: `admin123`
+- Erabiltzailea: `admin`
+- Pasahitza: `admin123`
 
-## Endpoints principales
+## Endpoint nagusiak
 
-- Salud del sistema: `GET /api/health`
-- Registro: `POST /api/auth/register`
-- Login: `POST /api/auth/login`
-- Perfil actual: `GET /api/auth/me`
-- Videojuegos: `/api/games`
-- Lista personal: `/api/favorites`
+- Sistemaren osasuna: `GET /api/health`
+- Erregistroa: `POST /api/auth/register`
+- Saio-hasiera: `POST /api/auth/login`
+- Uneko profila: `GET /api/auth/me`
+- Bideojokoak: `/api/games`
+- Zerrenda pertsonala: `/api/favorites`
 
-## Notas
+## Oharrak
 
-- La base de datos se genera automaticamente en `data/stim.sqlite`.
-- Para cambiar claves de JWT se puede usar la variable de entorno `JWT_SECRET`.
+- Datu-basea automatikoki sortzen da `data/stim.sqlite`-n.
+- JWT gakoak aldatzeko `JWT_SECRET` ingurune-aldagaia erabil daiteke.
