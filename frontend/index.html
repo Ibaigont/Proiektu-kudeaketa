@@ -1,9 +1,9 @@
 <!doctype html>
-<html lang="es">
+<html lang="eu">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>ESTIM | Venta de Videojuegos</title>
+    <title>ESTIM | Bideojokoen Salmenta</title>
     <link rel="stylesheet" href="styles.css" />
   </head>
   <body>
@@ -13,82 +13,82 @@
     <header class="topbar">
       <div>
         <h1>ESTIM</h1>
-        <p class="subtitle">Tu tienda de videojuegos en formato SPA + API</p>
+        <p class="subtitle">Zure bideojokoen denda SPA + API formatuan</p>
       </div>
       <div id="user-info" class="user-info hidden">
         <span id="welcome-text"></span>
-        <button id="logout-btn" class="btn btn-ghost">Cerrar sesion</button>
+        <button id="logout-btn" class="btn btn-ghost">Saioa itxi</button>
       </div>
     </header>
 
     <main class="container">
       <section id="auth-section" class="panel">
-        <h2>Acceso a ESTIM</h2>
+        <h2>ESTIM-era sarrera</h2>
         <div class="grid-two">
           <form id="login-form" class="card">
-            <h3>Iniciar sesion</h3>
-            <label>Usuario
+            <h3>Saioa hasi</h3>
+            <label>Erabiltzailea
               <input type="text" name="username" required />
             </label>
-            <label>Contrasena
+            <label>Pasahitza
               <input type="password" name="password" required />
             </label>
-            <button class="btn" type="submit">Entrar</button>
+            <button class="btn" type="submit">Sartu</button>
           </form>
 
           <form id="register-form" class="card">
-            <h3>Registro (usuario estandar)</h3>
-            <label>Usuario
+            <h3>Erregistroa (erabiltzaile estandarra)</h3>
+            <label>Erabiltzailea
               <input type="text" name="username" required />
             </label>
-            <label>Contrasena (min. 6)
+            <label>Pasahitza (gutx. 6)
               <input type="password" name="password" minlength="6" required />
             </label>
-            <button class="btn" type="submit">Crear cuenta</button>
+            <button class="btn" type="submit">Kontua sortu</button>
           </form>
         </div>
       </section>
 
       <section id="app-section" class="hidden">
         <div class="tabs">
-          <button class="tab-btn active" data-tab="catalogo">Catalogo</button>
-          <button class="tab-btn" data-tab="lista" id="my-list-tab">Mi lista</button>
-          <button class="tab-btn hidden" data-tab="admin" id="admin-tab">Panel admin</button>
+          <button class="tab-btn active" data-tab="catalogo">Katalogoa</button>
+          <button class="tab-btn" data-tab="lista" id="my-list-tab">Nire zerrenda</button>
+          <button class="tab-btn hidden" data-tab="admin" id="admin-tab">Admin panela</button>
         </div>
 
         <section id="catalogo" class="panel tab-content active">
-          <h2>Catalogo general de videojuegos</h2>
-          <p class="hint">Los usuarios estandar pueden guardar juegos en su lista personal.</p>
+          <h2>Bideojokoen katalogo orokorra</h2>
+          <p class="hint">Erabiltzaile estandarrek jokoak euren zerrenda pertsonalean gorde ditzakete.</p>
           <div id="games-list" class="card-list"></div>
         </section>
 
         <section id="lista" class="panel tab-content">
-          <h2>Mi lista personal</h2>
+          <h2>Nire zerrenda pertsonala</h2>
           <div id="favorites-list" class="card-list"></div>
         </section>
 
         <section id="admin" class="panel tab-content">
-          <h2>Gestion de videojuegos (CRUD)</h2>
+          <h2>Bideojokoen kudeaketa (CRUD)</h2>
           <form id="game-form" class="card form-inline">
             <input type="hidden" id="game-id" />
-            <label>Titulo
+            <label>Izenburua
               <input id="title" required />
             </label>
-            <label>Genero
+            <label>Generoa
               <input id="genre" required />
             </label>
             <label>Plataforma
               <input id="platform" required />
             </label>
-            <label>Precio
+            <label>Prezioa
               <input id="price" type="number" min="0" step="0.01" required />
             </label>
             <label>Stock
               <input id="stock" type="number" min="0" step="1" required />
             </label>
             <div class="row-buttons">
-              <button class="btn" type="submit" id="save-game-btn">Guardar</button>
-              <button class="btn btn-ghost" type="button" id="reset-form-btn">Limpiar</button>
+              <button class="btn" type="submit" id="save-game-btn">Gorde</button>
+              <button class="btn btn-ghost" type="button" id="reset-form-btn">Garbitu</button>
             </div>
           </form>
           <div id="admin-games-list" class="card-list"></div>
