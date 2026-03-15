@@ -1,7 +1,7 @@
 {
-  "name": "stim",
+  "name": "estim",
   "version": "1.0.0",
-  "description": "STIM - SPA + REST API CRUD for video game sales",
+  "description": "ESTIM - SPA + REST API CRUD for video game sales",
   "main": "backend/server.js",
   "scripts": {
     "start": "node backend/server.js",
@@ -12,7 +12,7 @@
     "spa",
     "rest",
     "crud",
-    "stim",
+    "estim",
     "videogames"
   ],
   "author": "",

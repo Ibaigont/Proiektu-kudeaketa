@@ -1,6 +1,6 @@
-# STIM - Web de Ventas de Videojuegos
+# ESTIM - Web de Ventas de Videojuegos
 
-STIM es una aplicacion web CRUD (Create, Read, Update, Delete) para la gestion y consulta de videojuegos.
+ESTIM es una aplicacion web CRUD (Create, Read, Update, Delete) para la gestion y consulta de videojuegos.
 Cumple arquitectura SPA + API REST y separa frontend, backend y persistencia de datos.
 
 ## Arquitectura

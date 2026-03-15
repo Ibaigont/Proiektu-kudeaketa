@@ -16,7 +16,7 @@ app.use("/api/games", gameRoutes);
 app.use("/api/favorites", favoriteRoutes);
 
 app.get("/api/health", (req, res) => {
-  res.json({ status: "ok", app: "STIM" });
+  res.json({ status: "ok", app: "ESTIM" });
 });
 
 app.use(express.static(path.join(__dirname, "..", "frontend")));
@@ -28,7 +28,7 @@ app.get("*", (req, res) => {
 initDb()
   .then(() => {
     app.listen(PORT, () => {
-      console.log(`STIM server running on http://localhost:${PORT}`);
+      console.log(`ESTIM server running on http://localhost:${PORT}`);
     });
   })
   .catch((error) => {
