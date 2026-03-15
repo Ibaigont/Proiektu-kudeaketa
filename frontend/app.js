@@ -16,6 +16,15 @@ const adminGamesList = document.getElementById("admin-games-list");
 const adminTab = document.getElementById("admin-tab");
 const myListTab = document.getElementById("my-list-tab");
 
+function escapeHtml(text) {
+  return String(text)
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#039;");
+}
+
 function showToast(message, isError = false) {
   toast.textContent = message;
   toast.classList.remove("hidden");
@@ -86,14 +95,14 @@ function renderGames() {
     .map((game) => {
       return `
         <article class="game-card">
-          <h4>${game.title}</h4>
-          <p><strong>Genero:</strong> ${game.genre}</p>
-          <p><strong>Plataforma:</strong> ${game.platform}</p>
+          <h4>${escapeHtml(game.title)}</h4>
+          <p><strong>Genero:</strong> ${escapeHtml(game.genre)}</p>
+          <p><strong>Plataforma:</strong> ${escapeHtml(game.platform)}</p>
           <p><strong>Precio:</strong> ${Number(game.price).toFixed(2)} EUR</p>
-          <p><strong>Stock:</strong> ${game.stock}</p>
+          <p><strong>Stock:</strong> ${escapeHtml(game.stock)}</p>
           ${
             canSaveFavorites
-              ? `<button class="btn" data-fav-add="${game.id}">Guardar en mi lista</button>`
+              ? `<button class="btn" data-fav-add="${escapeHtml(game.id)}">Guardar en mi lista</button>`
               : ""
           }
         </article>
@@ -117,11 +126,11 @@ function renderFavorites() {
     .map((game) => {
       return `
         <article class="game-card">
-          <h4>${game.title}</h4>
-          <p><strong>Genero:</strong> ${game.genre}</p>
-          <p><strong>Plataforma:</strong> ${game.platform}</p>
+          <h4>${escapeHtml(game.title)}</h4>
+          <p><strong>Genero:</strong> ${escapeHtml(game.genre)}</p>
+          <p><strong>Plataforma:</strong> ${escapeHtml(game.platform)}</p>
           <p><strong>Precio:</strong> ${Number(game.price).toFixed(2)} EUR</p>
-          <button class="btn btn-ghost" data-fav-remove="${game.id}">Quitar</button>
+          <button class="btn btn-ghost" data-fav-remove="${escapeHtml(game.id)}">Quitar</button>
         </article>
       `;
     })
@@ -143,12 +152,12 @@ function renderAdminGames() {
     .map((game) => {
       return `
         <article class="game-card">
-          <h4>${game.title}</h4>
-          <p>${game.genre} | ${game.platform}</p>
-          <p>Precio: ${Number(game.price).toFixed(2)} EUR | Stock: ${game.stock}</p>
+          <h4>${escapeHtml(game.title)}</h4>
+          <p>${escapeHtml(game.genre)} | ${escapeHtml(game.platform)}</p>
+          <p>Precio: ${Number(game.price).toFixed(2)} EUR | Stock: ${Number(game.stock)}</p>
           <div class="row-buttons">
-            <button class="btn" data-edit="${game.id}">Editar</button>
-            <button class="btn btn-ghost" data-delete="${game.id}">Eliminar</button>
+            <button class="btn" data-edit="${escapeHtml(game.id)}">Editar</button>
+            <button class="btn btn-ghost" data-delete="${escapeHtml(game.id)}">Eliminar</button>
           </div>
         </article>
       `;
@@ -183,8 +192,7 @@ async function bootstrapApp() {
   }
 
   try {
-    await loadGames();
-    await loadFavorites();
+    await Promise.all([loadGames(), loadFavorites()]);
   } catch (error) {
     clearSession();
     toggleAuthUI();
@@ -227,8 +235,7 @@ document.getElementById("login-form").addEventListener("submit", async (event) =
 
     setSession(data.token, data.user);
     toggleAuthUI();
-    await loadGames();
-    await loadFavorites();
+    await Promise.all([loadGames(), loadFavorites()]);
     event.target.reset();
     showToast("Sesion iniciada");
   } catch (error) {
@@ -312,8 +319,7 @@ adminGamesList.addEventListener("click", async (event) => {
 
     try {
       await api(`/api/games/${gameId}`, { method: "DELETE" });
-      await loadGames();
-      await loadFavorites();
+      await Promise.all([loadGames(), loadFavorites()]);
       showToast("Juego eliminado");
     } catch (error) {
       showToast(error.message, true);

@@ -103,12 +103,14 @@ async function initDb() {
       ["Cyberpunk 2077", "Action RPG", "PC", 49.99, 18]
     ];
 
+    await run("BEGIN TRANSACTION");
     for (const game of seedGames) {
       await run(
         `INSERT INTO games (title, genre, platform, price, stock) VALUES (?, ?, ?, ?, ?)`,
         game
       );
     }
+    await run("COMMIT");
   }
 }
 
