@@ -1,0 +1,261 @@
+:root {
+  --bg-1: #f4f0e8;
+  --bg-2: #e4f2ea;
+  --ink: #1e2933;
+  --accent: #0f766e;
+  --accent-2: #be123c;
+  --panel: rgba(255, 255, 255, 0.75);
+  --border: rgba(30, 41, 51, 0.15);
+  --shadow: 0 12px 30px rgba(15, 23, 42, 0.12);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  font-family: "Trebuchet MS", "Segoe UI", sans-serif;
+  color: var(--ink);
+  background: radial-gradient(circle at 20% 20%, var(--bg-2), transparent 45%),
+    radial-gradient(circle at 85% 10%, #fef3c7, transparent 30%),
+    linear-gradient(130deg, var(--bg-1), #f8fafc 60%);
+  overflow-x: hidden;
+}
+
+.bg-shape {
+  position: fixed;
+  border-radius: 999px;
+  pointer-events: none;
+  z-index: -1;
+  filter: blur(2px);
+}
+
+.bg-shape-1 {
+  width: 360px;
+  height: 360px;
+  left: -100px;
+  top: 35%;
+  background: rgba(15, 118, 110, 0.18);
+  animation: floatA 12s ease-in-out infinite;
+}
+
+.bg-shape-2 {
+  width: 260px;
+  height: 260px;
+  right: -60px;
+  top: 25%;
+  background: rgba(190, 18, 60, 0.2);
+  animation: floatB 10s ease-in-out infinite;
+}
+
+@keyframes floatA {
+  0%, 100% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(25px);
+  }
+}
+
+@keyframes floatB {
+  0%, 100% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-20px);
+  }
+}
+
+.topbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem 2rem;
+}
+
+.topbar h1 {
+  margin: 0;
+  font-size: 2.4rem;
+  letter-spacing: 0.07em;
+}
+
+.subtitle {
+  margin: 0.2rem 0 0;
+  opacity: 0.85;
+}
+
+.container {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 1rem;
+}
+
+.panel {
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 1.2rem;
+  box-shadow: var(--shadow);
+  backdrop-filter: blur(6px);
+  animation: fadeSlide 0.5s ease;
+}
+
+@keyframes fadeSlide {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.grid-two {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1rem;
+}
+
+.card {
+  background: #ffffff;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 1rem;
+}
+
+.card h3 {
+  margin-top: 0;
+}
+
+label {
+  display: block;
+  margin-bottom: 0.8rem;
+  font-weight: 600;
+  font-size: 0.95rem;
+}
+
+input {
+  width: 100%;
+  margin-top: 0.35rem;
+  border: 1px solid #cbd5e1;
+  border-radius: 8px;
+  padding: 0.55rem;
+  font-size: 1rem;
+}
+
+.btn {
+  border: none;
+  border-radius: 8px;
+  background: linear-gradient(100deg, var(--accent), #0ea5e9);
+  color: #fff;
+  font-weight: 700;
+  padding: 0.6rem 0.95rem;
+  cursor: pointer;
+}
+
+.btn:hover {
+  transform: translateY(-1px);
+}
+
+.btn-ghost {
+  background: #fff;
+  color: var(--ink);
+  border: 1px solid #cbd5e1;
+}
+
+.tabs {
+  display: flex;
+  gap: 0.5rem;
+  margin-bottom: 0.8rem;
+}
+
+.tab-btn {
+  border: 1px solid #94a3b8;
+  background: #fff;
+  border-radius: 8px;
+  padding: 0.45rem 0.8rem;
+  cursor: pointer;
+}
+
+.tab-btn.active {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: #fff;
+}
+
+.tab-content {
+  display: none;
+}
+
+.tab-content.active {
+  display: block;
+}
+
+.card-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(230px, 1fr));
+  gap: 0.8rem;
+}
+
+.game-card {
+  background: #fff;
+  border-radius: 10px;
+  border: 1px solid #dbeafe;
+  padding: 0.8rem;
+}
+
+.game-card h4 {
+  margin: 0 0 0.4rem;
+}
+
+.hint {
+  margin-top: 0;
+  opacity: 0.85;
+}
+
+.user-info {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+}
+
+.form-inline {
+  margin-bottom: 1rem;
+}
+
+.row-buttons {
+  display: flex;
+  gap: 0.6rem;
+  margin-top: 0.2rem;
+}
+
+.toast {
+  position: fixed;
+  right: 16px;
+  bottom: 16px;
+  padding: 0.8rem 1rem;
+  border-radius: 10px;
+  background: #111827;
+  color: #fff;
+  box-shadow: var(--shadow);
+}
+
+.hidden {
+  display: none !important;
+}
+
+@media (max-width: 860px) {
+  .grid-two {
+    grid-template-columns: 1fr;
+  }
+
+  .topbar {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.8rem;
+    padding: 1rem;
+  }
+}

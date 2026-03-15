@@ -1,0 +1,26 @@
+{
+  "name": "stim",
+  "version": "1.0.0",
+  "description": "STIM - SPA + REST API CRUD for video game sales",
+  "main": "backend/server.js",
+  "scripts": {
+    "start": "node backend/server.js",
+    "dev": "node backend/server.js",
+    "dev:watch": "node --watch backend/server.js"
+  },
+  "keywords": [
+    "spa",
+    "rest",
+    "crud",
+    "stim",
+    "videogames"
+  ],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "bcryptjs": "^2.4.3",
+    "express": "^4.21.2",
+    "jsonwebtoken": "^9.0.2",
+    "sqlite3": "^5.1.7"
+  }
+}

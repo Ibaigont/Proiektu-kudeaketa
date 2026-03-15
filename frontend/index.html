@@ -1,0 +1,103 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>STIM | Venta de Videojuegos</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <div class="bg-shape bg-shape-1"></div>
+    <div class="bg-shape bg-shape-2"></div>
+
+    <header class="topbar">
+      <div>
+        <h1>STIM</h1>
+        <p class="subtitle">Tu tienda de videojuegos en formato SPA + API</p>
+      </div>
+      <div id="user-info" class="user-info hidden">
+        <span id="welcome-text"></span>
+        <button id="logout-btn" class="btn btn-ghost">Cerrar sesion</button>
+      </div>
+    </header>
+
+    <main class="container">
+      <section id="auth-section" class="panel">
+        <h2>Acceso a STIM</h2>
+        <div class="grid-two">
+          <form id="login-form" class="card">
+            <h3>Iniciar sesion</h3>
+            <label>Usuario
+              <input type="text" name="username" required />
+            </label>
+            <label>Contrasena
+              <input type="password" name="password" required />
+            </label>
+            <button class="btn" type="submit">Entrar</button>
+          </form>
+
+          <form id="register-form" class="card">
+            <h3>Registro (usuario estandar)</h3>
+            <label>Usuario
+              <input type="text" name="username" required />
+            </label>
+            <label>Contrasena (min. 6)
+              <input type="password" name="password" minlength="6" required />
+            </label>
+            <button class="btn" type="submit">Crear cuenta</button>
+          </form>
+        </div>
+      </section>
+
+      <section id="app-section" class="hidden">
+        <div class="tabs">
+          <button class="tab-btn active" data-tab="catalogo">Catalogo</button>
+          <button class="tab-btn" data-tab="lista" id="my-list-tab">Mi lista</button>
+          <button class="tab-btn hidden" data-tab="admin" id="admin-tab">Panel admin</button>
+        </div>
+
+        <section id="catalogo" class="panel tab-content active">
+          <h2>Catalogo general de videojuegos</h2>
+          <p class="hint">Los usuarios estandar pueden guardar juegos en su lista personal.</p>
+          <div id="games-list" class="card-list"></div>
+        </section>
+
+        <section id="lista" class="panel tab-content">
+          <h2>Mi lista personal</h2>
+          <div id="favorites-list" class="card-list"></div>
+        </section>
+
+        <section id="admin" class="panel tab-content">
+          <h2>Gestion de videojuegos (CRUD)</h2>
+          <form id="game-form" class="card form-inline">
+            <input type="hidden" id="game-id" />
+            <label>Titulo
+              <input id="title" required />
+            </label>
+            <label>Genero
+              <input id="genre" required />
+            </label>
+            <label>Plataforma
+              <input id="platform" required />
+            </label>
+            <label>Precio
+              <input id="price" type="number" min="0" step="0.01" required />
+            </label>
+            <label>Stock
+              <input id="stock" type="number" min="0" step="1" required />
+            </label>
+            <div class="row-buttons">
+              <button class="btn" type="submit" id="save-game-btn">Guardar</button>
+              <button class="btn btn-ghost" type="button" id="reset-form-btn">Limpiar</button>
+            </div>
+          </form>
+          <div id="admin-games-list" class="card-list"></div>
+        </section>
+      </section>
+    </main>
+
+    <div id="toast" class="toast hidden"></div>
+
+    <script src="app.js"></script>
+  </body>
+</html>
