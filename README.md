@@ -1,1 +1,2 @@
 # Proiektu-kudeaketa
+Aupa talde
