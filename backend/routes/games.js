@@ -21,7 +21,7 @@ function validateGameFields({ title, genre, platform, price, stock }) {
 router.get("/", authenticate, async (req, res) => {
   try {
     const games = await all(
-      "SELECT id, title, genre, platform, price, stock, created_at, updated_at FROM games ORDER BY id DESC"
+      "SELECT id, title, genre, platform, price, stock, cover_image, created_at, updated_at FROM games ORDER BY id DESC"
     );
     return res.json({ games });
   } catch (error) {
@@ -31,7 +31,7 @@ router.get("/", authenticate, async (req, res) => {
 
 router.post("/", authenticate, requireAdmin, async (req, res) => {
   try {
-    const { title, genre, platform, price, stock } = req.body;
+    const { title, genre, platform, price, stock, cover_image } = req.body;
 
     const validationError = validateGameFields({ title, genre, platform, price, stock });
     if (validationError) {
@@ -40,14 +40,15 @@ router.post("/", authenticate, requireAdmin, async (req, res) => {
 
     const numPrice = Number(price);
     const numStock = Number(stock);
+    const coverUrl = cover_image && cover_image.trim() ? cover_image.trim() : null;
 
     const result = await run(
-      `INSERT INTO games (title, genre, platform, price, stock, updated_at) VALUES (?, ?, ?, ?, ?, CURRENT_TIMESTAMP)`,
-      [title, genre, platform, numPrice, numStock]
+      `INSERT INTO games (title, genre, platform, price, stock, cover_image, updated_at) VALUES (?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP)`,
+      [title, genre, platform, numPrice, numStock, coverUrl]
     );
 
     const game = await get(
-      "SELECT id, title, genre, platform, price, stock, created_at, updated_at FROM games WHERE id = ?",
+      "SELECT id, title, genre, platform, price, stock, cover_image, created_at, updated_at FROM games WHERE id = ?",
       [result.lastID]
     );
 
@@ -60,7 +61,7 @@ router.post("/", authenticate, requireAdmin, async (req, res) => {
 router.put("/:id", authenticate, requireAdmin, async (req, res) => {
   try {
     const gameId = Number(req.params.id);
-    const { title, genre, platform, price, stock } = req.body;
+    const { title, genre, platform, price, stock, cover_image } = req.body;
 
     const validationError = validateGameFields({ title, genre, platform, price, stock });
     if (validationError) {
@@ -69,10 +70,11 @@ router.put("/:id", authenticate, requireAdmin, async (req, res) => {
 
     const numPrice = Number(price);
     const numStock = Number(stock);
+    const coverUrl = cover_image && cover_image.trim() ? cover_image.trim() : null;
 
     const result = await run(
-      `UPDATE games SET title = ?, genre = ?, platform = ?, price = ?, stock = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ?`,
-      [title, genre, platform, numPrice, numStock, gameId]
+      `UPDATE games SET title = ?, genre = ?, platform = ?, price = ?, stock = ?, cover_image = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ?`,
+      [title, genre, platform, numPrice, numStock, coverUrl, gameId]
     );
 
     if (result.changes === 0) {
@@ -80,7 +82,7 @@ router.put("/:id", authenticate, requireAdmin, async (req, res) => {
     }
 
     const game = await get(
-      "SELECT id, title, genre, platform, price, stock, created_at, updated_at FROM games WHERE id = ?",
+      "SELECT id, title, genre, platform, price, stock, cover_image, created_at, updated_at FROM games WHERE id = ?",
       [gameId]
     );
 

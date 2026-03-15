@@ -69,10 +69,18 @@ async function initDb() {
       platform TEXT NOT NULL,
       price REAL NOT NULL CHECK(price >= 0),
       stock INTEGER NOT NULL CHECK(stock >= 0),
+      cover_image TEXT,
       created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
       updated_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
     )
   `);
+
+  // Migration: add cover_image column to existing databases
+  const gameColumns = await all("PRAGMA table_info(games)");
+  const hasCoverImage = gameColumns.some((col) => col.name === "cover_image");
+  if (!hasCoverImage) {
+    await run("ALTER TABLE games ADD COLUMN cover_image TEXT");
+  }
 
   await run(`
     CREATE TABLE IF NOT EXISTS favorites (
@@ -97,16 +105,16 @@ async function initDb() {
   const count = await get("SELECT COUNT(*) AS total FROM games");
   if (!count || count.total === 0) {
     const seedGames = [
-      ["Elden Ring", "Action RPG", "PC", 59.99, 25],
-      ["Hades", "Roguelike", "PC", 24.99, 40],
-      ["Stardew Valley", "Simulation", "PC", 14.99, 60],
-      ["Cyberpunk 2077", "Action RPG", "PC", 49.99, 18]
+      ["Elden Ring", "Action RPG", "PC", 59.99, 25, "https://cdn.cloudflare.steamstatic.com/steam/apps/1245620/header.jpg"],
+      ["Hades", "Roguelike", "PC", 24.99, 40, "https://cdn.cloudflare.steamstatic.com/steam/apps/1145360/header.jpg"],
+      ["Stardew Valley", "Simulation", "PC", 14.99, 60, "https://cdn.cloudflare.steamstatic.com/steam/apps/413150/header.jpg"],
+      ["Cyberpunk 2077", "Action RPG", "PC", 49.99, 18, "https://cdn.cloudflare.steamstatic.com/steam/apps/1091500/header.jpg"]
     ];
 
     await run("BEGIN TRANSACTION");
     for (const game of seedGames) {
       await run(
-        `INSERT INTO games (title, genre, platform, price, stock) VALUES (?, ?, ?, ?, ?)`,
+        `INSERT INTO games (title, genre, platform, price, stock, cover_image) VALUES (?, ?, ?, ?, ?, ?)`,
         game
       );
     }

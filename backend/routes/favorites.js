@@ -8,7 +8,7 @@ const router = express.Router();
 router.get("/", authenticate, async (req, res) => {
   try {
     const favorites = await all(
-      `SELECT g.id, g.title, g.genre, g.platform, g.price, g.stock
+      `SELECT g.id, g.title, g.genre, g.platform, g.price, g.stock, g.cover_image
        FROM favorites f
        INNER JOIN games g ON g.id = f.game_id
        WHERE f.user_id = ?

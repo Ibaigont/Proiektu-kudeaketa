@@ -93,8 +93,12 @@ function renderGames() {
 
   gamesList.innerHTML = state.games
     .map((game) => {
+      const coverHtml = game.cover_image
+        ? `<img src="${escapeHtml(game.cover_image)}" alt="${escapeHtml(game.title)}" class="game-cover" />`
+        : "";
       return `
         <article class="game-card">
+          ${coverHtml}
           <h4>${escapeHtml(game.title)}</h4>
           <p><strong>Generoa:</strong> ${escapeHtml(game.genre)}</p>
           <p><strong>Plataforma:</strong> ${escapeHtml(game.platform)}</p>
@@ -124,8 +128,12 @@ function renderFavorites() {
 
   favoritesList.innerHTML = state.favorites
     .map((game) => {
+      const coverHtml = game.cover_image
+        ? `<img src="${escapeHtml(game.cover_image)}" alt="${escapeHtml(game.title)}" class="game-cover" />`
+        : "";
       return `
         <article class="game-card">
+          ${coverHtml}
           <h4>${escapeHtml(game.title)}</h4>
           <p><strong>Generoa:</strong> ${escapeHtml(game.genre)}</p>
           <p><strong>Plataforma:</strong> ${escapeHtml(game.platform)}</p>
@@ -150,8 +158,12 @@ function renderAdminGames() {
 
   adminGamesList.innerHTML = state.games
     .map((game) => {
+      const coverHtml = game.cover_image
+        ? `<img src="${escapeHtml(game.cover_image)}" alt="${escapeHtml(game.title)}" class="game-cover" />`
+        : "";
       return `
         <article class="game-card">
+          ${coverHtml}
           <h4>${escapeHtml(game.title)}</h4>
           <p>${escapeHtml(game.genre)} | ${escapeHtml(game.platform)}</p>
           <p>Prezioa: ${Number(game.price).toFixed(2)} EUR | Stock: ${Number(game.stock)}</p>
@@ -310,6 +322,7 @@ adminGamesList.addEventListener("click", async (event) => {
     document.getElementById("platform").value = game.platform;
     document.getElementById("price").value = game.price;
     document.getElementById("stock").value = game.stock;
+    document.getElementById("cover-image").value = game.cover_image || "";
     document.getElementById("save-game-btn").textContent = "Eguneratu";
     return;
   }
@@ -336,7 +349,8 @@ document.getElementById("game-form").addEventListener("submit", async (event) =>
     genre: document.getElementById("genre").value.trim(),
     platform: document.getElementById("platform").value.trim(),
     price: Number(document.getElementById("price").value),
-    stock: Number(document.getElementById("stock").value)
+    stock: Number(document.getElementById("stock").value),
+    cover_image: document.getElementById("cover-image").value.trim() || null
   };
 
   try {
