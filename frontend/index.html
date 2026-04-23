@@ -5,6 +5,20 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>ESTIM | Bideojokoen Salmenta</title>
     <link rel="stylesheet" href="styles.css" />
+    <style>
+      /* Estilos extra rápidos para las etiquetas de estado */
+      .tag {
+        display: inline-block;
+        padding: 0.2rem 0.6rem;
+        border-radius: 12px;
+        font-size: 0.8rem;
+        font-weight: bold;
+        color: white;
+        margin-bottom: 0.5rem;
+      }
+      .tag-berria { background-color: #0f766e; }
+      .tag-erabilia { background-color: #be123c; }
+    </style>
   </head>
   <body>
     <div class="bg-shape bg-shape-1"></div>
@@ -53,12 +67,13 @@
         <div class="tabs">
           <button class="tab-btn active" data-tab="catalogo">Katalogoa</button>
           <button class="tab-btn" data-tab="lista" id="my-list-tab">Nire zerrenda</button>
+          <button class="tab-btn hidden" data-tab="ventas" id="my-sales-tab">Nire salmentak</button>
           <button class="tab-btn hidden" data-tab="admin" id="admin-tab">Admin panela</button>
         </div>
 
         <section id="catalogo" class="panel tab-content active">
           <h2>Bideojokoen katalogo orokorra</h2>
-          <p class="hint">Erabiltzaile estandarrek jokoak euren zerrenda pertsonalean gorde ditzakete.</p>
+          <p class="hint">Erabiltzaile estandarrek jokoak euren zerrendan gorde edo taldeko erosketak egin ditzakete.</p>
           <div id="games-list" class="card-list"></div>
         </section>
 
@@ -67,28 +82,41 @@
           <div id="favorites-list" class="card-list"></div>
         </section>
 
+        <section id="ventas" class="panel tab-content">
+          <h2>Saldu zure bideojokoak (Bigarren eskukoak)</h2>
+          <form id="user-sale-form" class="card form-inline">
+            <label>Izenburua <input id="user-title" required /></label>
+            <label>Generoa <input id="user-genre" required /></label>
+            <label>Plataforma <input id="user-platform" required /></label>
+            <label>Prezioa <input id="user-price" type="number" min="0" step="0.01" required /></label>
+            <label>Azalaren irudia (URL) <input id="user-cover-image" type="url" placeholder="https://..." /></label>
+            <input type="hidden" id="user-condition" value="erabilia" />
+            <input type="hidden" id="user-stock" value="1" />
+            
+            <div class="row-buttons">
+              <button class="btn" type="submit">Salgai jarri</button>
+            </div>
+          </form>
+        </section>
+
         <section id="admin" class="panel tab-content">
           <h2>Bideojokoen kudeaketa (CRUD)</h2>
           <form id="game-form" class="card form-inline">
             <input type="hidden" id="game-id" />
-            <label>Izenburua
-              <input id="title" required />
+            <label>Izenburua <input id="title" required /></label>
+            <label>Generoa <input id="genre" required /></label>
+            <label>Plataforma <input id="platform" required /></label>
+            
+            <label>Egoera (Estado)
+              <select id="condition" required style="width: 100%; padding: 0.55rem; border-radius: 8px; border: 1px solid #cbd5e1; margin-top: 0.35rem;">
+                <option value="berria">Berria</option>
+                <option value="erabilia">Bigarren eskukoa</option>
+              </select>
             </label>
-            <label>Generoa
-              <input id="genre" required />
-            </label>
-            <label>Plataforma
-              <input id="platform" required />
-            </label>
-            <label>Prezioa
-              <input id="price" type="number" min="0" step="0.01" required />
-            </label>
-            <label>Stock
-              <input id="stock" type="number" min="0" step="1" required />
-            </label>
-            <label>Azalaren irudia (URL)
-              <input id="cover-image" type="url" placeholder="https://..." />
-            </label>
+
+            <label>Prezioa <input id="price" type="number" min="0" step="0.01" required /></label>
+            <label>Stock <input id="stock" type="number" min="0" step="1" required /></label>
+            <label>Azalaren irudia (URL) <input id="cover-image" type="url" placeholder="https://..." /></label>
             <div class="row-buttons">
               <button class="btn" type="submit" id="save-game-btn">Gorde</button>
               <button class="btn btn-ghost" type="button" id="reset-form-btn">Garbitu</button>
