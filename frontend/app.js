@@ -28,6 +28,34 @@ function escapeHtml(text) {
     .replace(/'/g, "&#039;");
 }
 
+function fallbackCoverFor(title) {
+  const safeTitle = String(title || "No Cover")
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/\"/g, "&quot;");
+
+  const svg = `
+    <svg xmlns="http://www.w3.org/2000/svg" width="600" height="300" viewBox="0 0 600 300" role="img" aria-label="${safeTitle}">
+      <defs>
+        <linearGradient id="bg" x1="0" x2="1" y1="0" y2="1">
+          <stop offset="0%" stop-color="#dbeafe" />
+          <stop offset="100%" stop-color="#e2e8f0" />
+        </linearGradient>
+      </defs>
+      <rect width="600" height="300" rx="18" fill="url(#bg)" />
+      <circle cx="500" cy="70" r="58" fill="rgba(15, 118, 110, 0.18)" />
+      <circle cx="110" cy="235" r="72" fill="rgba(190, 18, 60, 0.16)" />
+      <text x="50%" y="50%" text-anchor="middle" dominant-baseline="middle"
+        fill="#334155" font-family="Trebuchet MS, Segoe UI, sans-serif" font-size="34" font-weight="700">
+        ${safeTitle}
+      </text>
+    </svg>
+  `.trim();
+
+  return `data:image/svg+xml;charset=UTF-8,${encodeURIComponent(svg)}`;
+}
+
 function showToast(message, isError = false) {
   toast.textContent = message;
   toast.classList.remove("hidden");
@@ -107,9 +135,11 @@ function renderGames() {
 
   gamesList.innerHTML = state.games
     .map((game) => {
-      const coverHtml = game.cover_image
-        ? `<img src="${escapeHtml(game.cover_image)}" alt="${escapeHtml(game.title)}" class="game-cover" />`
-        : "";
+      const coverSrc = game.cover_image && game.cover_image.trim()
+        ? game.cover_image.trim()
+        : fallbackCoverFor(game.title);
+      const fallbackSrc = fallbackCoverFor(game.title);
+      const coverHtml = `<img src="${escapeHtml(coverSrc)}" alt="${escapeHtml(game.title)}" class="game-cover" loading="lazy" data-fallback="${escapeHtml(fallbackSrc)}" />`;
         
       // Lógica de condición (Nuevo / Segunda mano)
       const condition = game.condition || "berria"; // Por defecto berria si no existe
@@ -138,6 +168,21 @@ function renderGames() {
     })
     .join("");
 }
+
+gamesList.addEventListener(
+  "error",
+  (event) => {
+    const image = event.target;
+    if (!(image instanceof HTMLImageElement)) return;
+    if (!image.classList.contains("game-cover")) return;
+
+    const fallbackSrc = image.dataset.fallback;
+    if (fallbackSrc && image.src !== fallbackSrc) {
+      image.src = fallbackSrc;
+    }
+  },
+  true
+);
 
 function renderFavorites() {
   if (!state.user || state.user.role !== "standard") return;

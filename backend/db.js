@@ -120,6 +120,22 @@ async function initDb() {
     }
     await run("COMMIT");
   }
+
+  const defaultCoversByTitle = {
+    "Elden Ring": "https://cdn.cloudflare.steamstatic.com/steam/apps/1245620/header.jpg",
+    Hades: "https://cdn.cloudflare.steamstatic.com/steam/apps/1145360/header.jpg",
+    "Stardew Valley": "https://cdn.cloudflare.steamstatic.com/steam/apps/413150/header.jpg",
+    "Cyberpunk 2077": "https://cdn.cloudflare.steamstatic.com/steam/apps/1091500/header.jpg"
+  };
+
+  for (const [title, cover] of Object.entries(defaultCoversByTitle)) {
+    await run(
+      `UPDATE games
+       SET cover_image = ?, updated_at = CURRENT_TIMESTAMP
+       WHERE title = ? AND (cover_image IS NULL OR TRIM(cover_image) = '')`,
+      [cover, title]
+    );
+  }
 }
 
 module.exports = {
