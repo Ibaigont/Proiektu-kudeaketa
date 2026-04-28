@@ -9,6 +9,12 @@ const authSection = document.getElementById("auth-section");
 const appSection = document.getElementById("app-section");
 const userInfo = document.getElementById("user-info");
 const welcomeText = document.getElementById("welcome-text");
+const balanceText = document.getElementById("balance-text");
+const addFundsBtn = document.getElementById("add-funds-btn");
+const fundsModal = document.getElementById("funds-modal");
+const fundsForm = document.getElementById("funds-form");
+const fundsAmount = document.getElementById("funds-amount");
+const fundsCancelBtn = document.getElementById("funds-cancel-btn");
 const toast = document.getElementById("toast");
 const gamesList = document.getElementById("games-list");
 const favoritesList = document.getElementById("favorites-list");
@@ -90,12 +96,57 @@ async function api(path, options = {}) {
   return data;
 }
 
+function formatBalance(value, isAdmin = false) {
+  if (isAdmin) {
+    return "∞";
+  }
+  const num = Number(value);
+  if (!Number.isFinite(num)) {
+    return "0.00 EUR";
+  }
+  return `${num.toFixed(2)} EUR`;
+}
+
+function updateUserInfo() {
+  if (!state.user) return;
+  welcomeText.textContent = `Erabiltzailea: ${state.user.username} (${state.user.role})`;
+  if (balanceText) {
+    balanceText.textContent = `Saldoa: ${formatBalance(state.user.balance, state.user.role === "admin")}`;
+  }
+}
+
 function setSession(token, user) {
   state.token = token;
   state.user = user;
   localStorage.setItem("stimToken", token);
   localStorage.setItem("stimUser", JSON.stringify(user));
+  updateUserInfo();
   trackEvent("User_Login", { username: user.username, role: user.role });
+}
+
+function updateStoredUser(user) {
+  state.user = user;
+  localStorage.setItem("stimUser", JSON.stringify(user));
+  updateUserInfo();
+}
+
+function openFundsModal() {
+  if (!fundsModal) return;
+  fundsModal.classList.remove("hidden");
+  fundsModal.setAttribute("aria-hidden", "false");
+  if (fundsAmount) {
+    fundsAmount.value = "";
+    fundsAmount.focus();
+  }
+}
+
+function closeFundsModal() {
+  if (!fundsModal) return;
+  fundsModal.classList.add("hidden");
+  fundsModal.setAttribute("aria-hidden", "true");
+  if (fundsForm) {
+    fundsForm.reset();
+  }
 }
 
 function clearSession() {
@@ -104,6 +155,10 @@ function clearSession() {
   state.user = null;
   localStorage.removeItem("stimToken");
   localStorage.removeItem("stimUser");
+  if (balanceText) {
+    balanceText.textContent = "";
+  }
+  closeFundsModal();
 }
 
 function toggleAuthUI() {
@@ -114,7 +169,7 @@ function toggleAuthUI() {
   userInfo.classList.toggle("hidden", !loggedIn);
 
   if (loggedIn) {
-    welcomeText.textContent = `Erabiltzailea: ${state.user.username} (${state.user.role})`;
+    updateUserInfo();
 
     const isAdmin = state.user.role === "admin";
     const isStandard = state.user.role === "standard";
@@ -122,6 +177,9 @@ function toggleAuthUI() {
     adminTab.classList.toggle("hidden", !isAdmin);
     myListTab.classList.toggle("hidden", !isStandard);
     mySalesTab.classList.toggle("hidden", !isStandard); // Mostrar ventas solo a usuarios estándar
+    if (addFundsBtn) {
+      addFundsBtn.classList.toggle("hidden", !isStandard);
+    }
   }
 }
 
@@ -140,6 +198,12 @@ function renderGames() {
         : fallbackCoverFor(game.title);
       const fallbackSrc = fallbackCoverFor(game.title);
       const coverHtml = `<img src="${escapeHtml(coverSrc)}" alt="${escapeHtml(game.title)}" class="game-cover" loading="lazy" data-fallback="${escapeHtml(fallbackSrc)}" />`;
+      const hasStock = Number(game.stock) > 0;
+      const hasBalance = typeof state.user?.balance === "number"
+        ? state.user.balance >= Number(game.price)
+        : true;
+      const buyDisabled = !hasStock;
+      const buyTitle = !hasStock ? "Ez dago stockik" : !hasBalance ? "Saldo nahikorik ez" : "Erosi";
         
       // Lógica de condición (Nuevo / Segunda mano)
       const condition = game.condition || "berria"; // Por defecto berria si no existe
@@ -159,7 +223,7 @@ function renderGames() {
             canInteract
               ? `<div style="display: flex; flex-direction: column; gap: 0.5rem; margin-top: 1rem;">
                    <button class="btn btn-ghost" data-fav-add="${escapeHtml(game.id)}">Zerrendan gorde</button>
-                   <button class="btn" style="background: linear-gradient(100deg, #be123c, #f43f5e);" data-group-buy="${escapeHtml(game.id)}">Taldeko erosketa</button>
+                   <button class="btn" data-buy="${escapeHtml(game.id)}" ${buyDisabled ? "disabled" : ""} title="${escapeHtml(buyTitle)}">Erosi</button>
                  </div>`
               : ""
           }
@@ -169,20 +233,19 @@ function renderGames() {
     .join("");
 }
 
-gamesList.addEventListener(
-  "error",
-  (event) => {
-    const image = event.target;
-    if (!(image instanceof HTMLImageElement)) return;
-    if (!image.classList.contains("game-cover")) return;
+function handleCoverError(event) {
+  const image = event.target;
+  if (!(image instanceof HTMLImageElement)) return;
+  if (!image.classList.contains("game-cover")) return;
 
-    const fallbackSrc = image.dataset.fallback;
-    if (fallbackSrc && image.src !== fallbackSrc) {
-      image.src = fallbackSrc;
-    }
-  },
-  true
-);
+  const fallbackSrc = image.dataset.fallback;
+  if (fallbackSrc && image.src !== fallbackSrc) {
+    image.src = fallbackSrc;
+  }
+}
+
+gamesList.addEventListener("error", handleCoverError, true);
+favoritesList.addEventListener("error", handleCoverError, true);
 
 function renderFavorites() {
   if (!state.user || state.user.role !== "standard") return;
@@ -194,8 +257,14 @@ function renderFavorites() {
 
   favoritesList.innerHTML = state.favorites
     .map((game) => {
+      const coverSrc = game.cover_image && game.cover_image.trim()
+        ? game.cover_image.trim()
+        : fallbackCoverFor(game.title);
+      const fallbackSrc = fallbackCoverFor(game.title);
+      const coverHtml = `<img src="${escapeHtml(coverSrc)}" alt="${escapeHtml(game.title)}" class="game-cover" loading="lazy" data-fallback="${escapeHtml(fallbackSrc)}" />`;
       return `
         <article class="game-card">
+          ${coverHtml}
           <h4>${escapeHtml(game.title)}</h4>
           <p><strong>Prezioa:</strong> ${Number(game.price).toFixed(2)} EUR</p>
           <button class="btn btn-ghost" data-fav-remove="${escapeHtml(game.id)}">Kendu</button>
@@ -274,7 +343,7 @@ document.querySelectorAll(".tab-btn").forEach((button) => {
 // Lógica de Catálogo (Añadir a lista y Compra en Grupo)
 gamesList.addEventListener("click", async (event) => {
   const favBtn = event.target.closest("button[data-fav-add]");
-  const groupBtn = event.target.closest("button[data-group-buy]");
+  const buyBtn = event.target.closest("button[data-buy]");
 
   if (favBtn) {
     try {
@@ -287,10 +356,34 @@ gamesList.addEventListener("click", async (event) => {
     }
   }
 
-  if (groupBtn) {
-    // Aquí iría la lógica real de backend para agrupar usuarios
-    showToast("Taldeko erosketa eskaera bidali da! (Simulazioa)");
-    trackEvent("Group_Buy_Initiated", { gameId: groupBtn.dataset.groupBuy, userId: state.user.id });
+  if (buyBtn) {
+    if (buyBtn.disabled) return;
+    const gameId = Number(buyBtn.dataset.buy);
+    const game = state.games.find((item) => item.id === gameId);
+    if (!game) {
+      showToast("Jokoa ez da aurkitu", true);
+      return;
+    }
+    if (Number(game.stock) <= 0) {
+      showToast("Ez dago stockik", true);
+      return;
+    }
+    const balance = Number(state.user?.balance);
+    if (Number.isFinite(balance) && balance < Number(game.price)) {
+      showToast("Saldo nahikorik ez", true);
+      return;
+    }
+    try {
+      const data = await api(`/api/games/${gameId}/purchase`, { method: "POST" });
+      if (data.user) {
+        updateStoredUser(data.user);
+      }
+      await Promise.all([loadGames(), loadFavorites()]);
+      showToast("Erosketa eginda!");
+      trackEvent("Purchase_Completed", { gameId, userId: state.user.id });
+    } catch (error) {
+      showToast(error.message, true);
+    }
   }
 });
 
@@ -343,7 +436,7 @@ document.getElementById("user-sale-form").addEventListener("submit", async (even
 
   try {
     // En un proyecto real esto podría ir a un endpoint diferente como /api/user-sales
-    await api("/api/games", { method: "POST", body: JSON.stringify(payload) });
+    await api("/api/games/user-sale", { method: "POST", body: JSON.stringify(payload) });
     showToast("Zure jokoa salgai jarri da!");
     trackEvent("User_Game_Listed", { title: payload.title });
     
@@ -394,6 +487,59 @@ document.getElementById("logout-btn").addEventListener("click", () => {
   gamesList.innerHTML = ""; favoritesList.innerHTML = ""; adminGamesList.innerHTML = "";
   showToast("Saioa itxi da");
 });
+
+if (addFundsBtn) {
+  addFundsBtn.addEventListener("click", () => {
+    if (!state.user || state.user.role !== "standard") return;
+    openFundsModal();
+  });
+}
+
+if (fundsCancelBtn) {
+  fundsCancelBtn.addEventListener("click", closeFundsModal);
+}
+
+if (fundsModal) {
+  fundsModal.addEventListener("click", (event) => {
+    if (event.target === fundsModal) {
+      closeFundsModal();
+    }
+  });
+}
+
+document.addEventListener("keydown", (event) => {
+  if (event.key === "Escape" && fundsModal && !fundsModal.classList.contains("hidden")) {
+    closeFundsModal();
+  }
+});
+
+if (fundsForm) {
+  fundsForm.addEventListener("submit", async (event) => {
+    event.preventDefault();
+    if (!fundsAmount) return;
+    const amount = Number(fundsAmount.value);
+    if (!Number.isFinite(amount) || amount <= 0) {
+      showToast("Sartu balio egokia", true);
+      return;
+    }
+
+    try {
+      const data = await api("/api/auth/funds", {
+        method: "POST",
+        body: JSON.stringify({ amount })
+      });
+      if (data.user) {
+        updateStoredUser(data.user);
+      }
+      renderGames();
+      closeFundsModal();
+      showToast("Saldoa eguneratuta");
+      trackEvent("Balance_Added", { amount, userId: state.user?.id });
+    } catch (error) {
+      showToast(error.message, true);
+    }
+  });
+}
 
 document.getElementById("reset-form-btn").addEventListener("click", () => {
   document.getElementById("game-form").reset();

@@ -31,6 +31,8 @@
       </div>
       <div id="user-info" class="user-info hidden">
         <span id="welcome-text"></span>
+        <span id="balance-text" class="balance-pill"></span>
+        <button id="add-funds-btn" class="btn btn-ghost">Saldoa gehitu</button>
         <button id="logout-btn" class="btn btn-ghost">Saioa itxi</button>
       </div>
     </header>
@@ -73,7 +75,7 @@
 
         <section id="catalogo" class="panel tab-content active">
           <h2>Bideojokoen katalogo orokorra</h2>
-          <p class="hint">Erabiltzaile estandarrek jokoak euren zerrendan gorde edo taldeko erosketak egin ditzakete.</p>
+          <p class="hint">Erabiltzaile estandarrek jokoak euren zerrendan gorde edo erosi ditzakete.</p>
           <div id="games-list" class="card-list"></div>
         </section>
 
@@ -126,6 +128,22 @@
         </section>
       </section>
     </main>
+
+    <div id="funds-modal" class="modal hidden" aria-hidden="true">
+      <div class="modal-card">
+        <h3>Saldoa gehitu</h3>
+        <p>Idatzi zenbat diru gehitu nahi duzun.</p>
+        <form id="funds-form">
+          <label>Kopurua (EUR)
+            <input id="funds-amount" type="number" min="0.01" step="0.01" required />
+          </label>
+          <div class="row-buttons">
+            <button class="btn btn-ghost" type="button" id="funds-cancel-btn">Utzi</button>
+            <button class="btn" type="submit">Gehitu</button>
+          </div>
+        </form>
+      </div>
+    </div>
 
     <div id="toast" class="toast hidden"></div>
 

@@ -30,13 +30,14 @@ router.post("/register", async (req, res) => {
       [username, passwordHash]
     );
 
+    const createdUser = await get(
+      "SELECT id, username, role, balance FROM users WHERE id = ?",
+      [result.lastID]
+    );
+
     return res.status(201).json({
       message: "User registered successfully",
-      user: {
-        id: result.lastID,
-        username,
-        role: "standard"
-      }
+      user: createdUser
     });
   } catch (error) {
     return res.status(500).json({ message: "Server error", error: error.message });
@@ -51,7 +52,10 @@ router.post("/login", async (req, res) => {
       return res.status(400).json({ message: "Username and password are required" });
     }
 
-    const user = await get("SELECT id, username, password_hash, role FROM users WHERE username = ?", [username]);
+    const user = await get(
+      "SELECT id, username, password_hash, role, balance FROM users WHERE username = ?",
+      [username]
+    );
     if (!user) {
       return res.status(401).json({ message: "Invalid credentials" });
     }
@@ -72,7 +76,8 @@ router.post("/login", async (req, res) => {
       user: {
         id: user.id,
         username: user.username,
-        role: user.role
+        role: user.role,
+        balance: user.balance
       }
     });
   } catch (error) {
@@ -81,7 +86,41 @@ router.post("/login", async (req, res) => {
 });
 
 router.get("/me", authenticate, async (req, res) => {
-  return res.json({ user: req.user });
+  try {
+    const user = await get(
+      "SELECT id, username, role, balance FROM users WHERE id = ?",
+      [req.user.id]
+    );
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+    return res.json({ user });
+  } catch (error) {
+    return res.status(500).json({ message: "Server error", error: error.message });
+  }
+});
+
+router.post("/funds", authenticate, async (req, res) => {
+  try {
+    const amount = Number(req.body.amount);
+    if (!Number.isFinite(amount) || amount <= 0) {
+      return res.status(400).json({ message: "Amount must be greater than 0" });
+    }
+
+    const result = await run("UPDATE users SET balance = balance + ? WHERE id = ?", [amount, req.user.id]);
+    if (result.changes === 0) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    const user = await get(
+      "SELECT id, username, role, balance FROM users WHERE id = ?",
+      [req.user.id]
+    );
+
+    return res.json({ message: "Balance updated", user });
+  } catch (error) {
+    return res.status(500).json({ message: "Server error", error: error.message });
+  }
 });
 
 module.exports = router;

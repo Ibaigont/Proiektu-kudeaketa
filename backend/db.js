@@ -57,6 +57,7 @@ async function initDb() {
       username TEXT NOT NULL UNIQUE,
       password_hash TEXT NOT NULL,
       role TEXT NOT NULL CHECK(role IN ('admin', 'standard')),
+      balance REAL NOT NULL DEFAULT 100,
       created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
     )
   `);
@@ -70,10 +71,18 @@ async function initDb() {
       price REAL NOT NULL CHECK(price >= 0),
       stock INTEGER NOT NULL CHECK(stock >= 0),
       cover_image TEXT,
+      condition TEXT NOT NULL DEFAULT 'berria' CHECK(condition IN ('berria', 'erabilia')),
       created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
       updated_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
     )
   `);
+
+  const userColumns = await all("PRAGMA table_info(users)");
+  const hasBalance = userColumns.some((col) => col.name === "balance");
+  if (!hasBalance) {
+    await run("ALTER TABLE users ADD COLUMN balance REAL NOT NULL DEFAULT 100");
+  }
+  await run("UPDATE users SET balance = 100 WHERE balance IS NULL");
 
   // Migration: add cover_image column to existing databases
   const gameColumns = await all("PRAGMA table_info(games)");
@@ -81,6 +90,12 @@ async function initDb() {
   if (!hasCoverImage) {
     await run("ALTER TABLE games ADD COLUMN cover_image TEXT");
   }
+
+  const hasCondition = gameColumns.some((col) => col.name === "condition");
+  if (!hasCondition) {
+    await run("ALTER TABLE games ADD COLUMN condition TEXT NOT NULL DEFAULT 'berria'");
+  }
+  await run("UPDATE games SET condition = 'berria' WHERE condition IS NULL OR TRIM(condition) = ''");
 
   await run(`
     CREATE TABLE IF NOT EXISTS favorites (
@@ -105,16 +120,16 @@ async function initDb() {
   const count = await get("SELECT COUNT(*) AS total FROM games");
   if (!count || count.total === 0) {
     const seedGames = [
-      ["Elden Ring", "Action RPG", "PC", 59.99, 25, "https://cdn.cloudflare.steamstatic.com/steam/apps/1245620/header.jpg"],
-      ["Hades", "Roguelike", "PC", 24.99, 40, "https://cdn.cloudflare.steamstatic.com/steam/apps/1145360/header.jpg"],
-      ["Stardew Valley", "Simulation", "PC", 14.99, 60, "https://cdn.cloudflare.steamstatic.com/steam/apps/413150/header.jpg"],
-      ["Cyberpunk 2077", "Action RPG", "PC", 49.99, 18, "https://cdn.cloudflare.steamstatic.com/steam/apps/1091500/header.jpg"]
+      ["Elden Ring", "Action RPG", "PC", 59.99, 25, "https://cdn.cloudflare.steamstatic.com/steam/apps/1245620/header.jpg", "berria"],
+      ["Hades", "Roguelike", "PC", 24.99, 40, "https://cdn.cloudflare.steamstatic.com/steam/apps/1145360/header.jpg", "berria"],
+      ["Stardew Valley", "Simulation", "PC", 14.99, 60, "https://cdn.cloudflare.steamstatic.com/steam/apps/413150/header.jpg", "berria"],
+      ["Cyberpunk 2077", "Action RPG", "PC", 49.99, 18, "https://cdn.cloudflare.steamstatic.com/steam/apps/1091500/header.jpg", "berria"]
     ];
 
     await run("BEGIN TRANSACTION");
     for (const game of seedGames) {
       await run(
-        `INSERT INTO games (title, genre, platform, price, stock, cover_image) VALUES (?, ?, ?, ?, ?, ?)`,
+        `INSERT INTO games (title, genre, platform, price, stock, cover_image, condition) VALUES (?, ?, ?, ?, ?, ?, ?)`,
         game
       );
     }
